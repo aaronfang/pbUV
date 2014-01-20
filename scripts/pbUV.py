@@ -1,5 +1,5 @@
 import math
-import pickle
+# import pickle
 import pymel.core as pm
 
 
@@ -129,7 +129,7 @@ class transformUI(object):
                                       commandRepeatable=True)
                     pm.iconTextButton(image1='pbUV/tTranslateRight.png', c=lambda *args: self.move(u=1),
                                       commandRepeatable=True)
-                    pm.iconTextButton(image1='pbUV/tRot180CCW.png', c=lambda *args:self.rotate(angle=180, dir='ccw'),
+                    pm.iconTextButton(image1='pbUV/tRot180CCW.png', c=lambda *args: self.rotate(angle=180, dir='ccw'),
                                       commandRepeatable=True)
 
                 with pm.rowColumnLayout(nc=4):
@@ -184,12 +184,12 @@ class transformUI(object):
         pm.polyEditUV(uValue=self.manipValue.getValue() * u, vValue=self.manipValue.getValue() * v)
 
     def rotate(self, angle=None, dir='ccw'):
-        if angle == None:
+        if angle is None:
             angle = self.manipValue.getValue()
 
         if dir == 'ccw':
             dir = 1
-        elif dir =='cw':
+        elif dir == 'cw':
             dir = -1
 
         pm.polyEditUV(pu=self.pivLoc()[0], pv=self.pivLoc()[1], angle=angle * dir)
@@ -240,7 +240,7 @@ class setEditorUI(object):
                     pm.button(l='Rename', c=self.renameSet)
                     pm.button(l='Delete', c=self.deleteSet)
                 with pm.rowLayout(nc=2):
-                    pm.button(l='UV Linking', c=lambda *args:pm.mel.UVCentricUVLinkingEditor())
+                    pm.button(l='UV Linking', c=lambda *args: pm.mel.UVCentricUVLinkingEditor())
                     pm.button(l='Refresh', c=self.updateSets)
 
     def updateSets(self, *args):  # FIXME
@@ -264,7 +264,6 @@ class setEditorUI(object):
             self.uvs.setSelectItem('{0} | {1}'.format(sel[0].getParent(), sel[0].getCurrentUVSetName()))
         except:
             pass
-
 
     def selectSet(self, *args):
         uvSet = self.uvs.getSelectItem()[0].split(' | ')
@@ -491,6 +490,7 @@ class unfoldUI(toolsUI):
                 inRange = min(inRange, key=lambda x: x[1])
                 pm.polyEditUV(snapUVs[i], u=inRange[0][0], v=inRange[0][1], r=False)
 
+
 class alignUI(toolsUI):
     def __init__(self, par):
         toolsUI.__init__(self, par)
@@ -637,7 +637,7 @@ class snapUI(toolsUI):
             pm.polyEditUV(uvs.uvs, u=right, v=centerV)
         if pos == 'bottomLeft':
             pm.polyEditUV(uvs.uvs, u=left, v=bottom)
-        if pos =='bottomCenter':
+        if pos == 'bottomCenter':
             pm.polyEditUV(uvs.uvs, u=centerU, v=bottom)
         if pos == 'bottomRight':
             pm.polyEditUV(uvs.uvs, u=right, v=bottom)
@@ -698,7 +698,6 @@ class isolateUI(toolsUI):  # TODO
         else:
             pm.textureWindow(self.editor, e=True, useFaceGroup=False)
             pm.optionVar['textureWindowShaderFacesMode'] = 0
-
 
 
 class manipUI(toolsUI):
@@ -781,7 +780,7 @@ class opts01UI(toolsUI):
                 pm.iconTextCheckBox(image1='filteredMode.png', v=pm.textureWindow(self.editor, q=True, iuf=True),
                                     onc=lambda *args: pm.textureWindow(self.editor, e=True, iuf=True),
                                     ofc=lambda *args: pm.textureWindow(self.editor, e=True, iuf=False),
-                                ann=pm.mel.uiRes('m_textureWindowCreateToolBar.kToggleFilteredImageAnnot'))
+                                    ann=pm.mel.uiRes('m_textureWindowCreateToolBar.kToggleFilteredImageAnnot'))
 
                 self.dimImageBtn = pm.iconTextCheckBox('dimmerButton', image1='dimTexture.png',
                                                        ann=pm.mel.uiRes('m_textureWindowCreateToolBar.kDimImageAnnot'),
@@ -790,9 +789,8 @@ class opts01UI(toolsUI):
                                                        value=pm.textureWindow(self.editor, q=True, imageBaseColor=True) < 0.9)
 
                 self.dimImage = pm.floatSlider(minValue=0.0, maxValue=1.0,
-                                            value=pm.textureWindow(self.editor, q=True, imageBaseColor=True)[0],
-                                            cc=self.dimImageAttr, dc=self.dimImageAttr)
-
+                                               value=pm.textureWindow(self.editor, q=True, imageBaseColor=True)[0],
+                                               cc=self.dimImageAttr, dc=self.dimImageAttr)
 
     def toggleImageDisplay(self, *args):
         if pm.textureWindow(self.editor, q=True, id=True):
@@ -884,9 +882,9 @@ class opts03UI(toolsUI):
             pm.popupMenu(button=3, p=swapBG, pmc=lambda *arg: pm.mel.performTextureViewBakeTextureOptions(1))
 
             pm.iconTextButton(image1='updatePsdTextureEditor.png',
-                                ann=pm.mel.uiRes('m_textureWindowCreateToolBar.kUpdatePSDNetworksAnnot'),
-                                c=lambda *args: pm.mel.psdUpdateTextures(),
-                                commandRepeatable=True)
+                              ann=pm.mel.uiRes('m_textureWindowCreateToolBar.kUpdatePSDNetworksAnnot'),
+                              c=lambda *args: pm.mel.psdUpdateTextures(),
+                              commandRepeatable=True)
 
             pm.iconTextButton(image1='bakeEditor.png',
                               ann=pm.mel.uiRes('m_textureWindowCreateToolBar.kForceEditorTextureRebakeAnnot'),
