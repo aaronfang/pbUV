@@ -28,7 +28,7 @@ class UI(object):
         if pm.window('pbUV', exists=True):
             pm.deleteUI('pbUV')
 
-        window = pm.window('pbUV', s=True, title='{0} | {1}'.format(title, ver), toolbox=False)
+        window = pm.window('pbUV', s=True, title='{0} | {1}'.format(title, ver))
 
         try:
             pane = pm.paneLayout('textureEditorPanel', paneSize=[1, 1, 1], cn='vertical2', swp=1)
@@ -482,7 +482,7 @@ class unfoldUI(toolsUI):
             for j in range(len(allUVs)):
                 x = snapPos[i][0] - allPos[j][0]
                 y = snapPos[i][1] - allPos[j][1]
-                dist = math.sqrt((x**2) + (y**2))
+                dist = math.sqrt((x ** 2) + (y ** 2))
                 if dist < maxRange:
                     inRange.append((allPos[j], dist))
 
