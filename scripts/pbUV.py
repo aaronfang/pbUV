@@ -88,10 +88,10 @@ class globalOptions(object):
                 with pm.rowColumnLayout(nc=3, cw=[20, 60]):
                     pm.text(l='Width:')
                     self.width = pm.intField(v=1024, width=42)
-                    self.resPresets = pm.optionMenu()
+                    pm.optionMenu()
                     pm.text(l='Height:')
                     self.height = pm.intField(v=1024, width=42)
-                    self.resPresets = pm.optionMenu()
+                    pm.optionMenu()
                 pm.button(l='Get Map Size')
 
                 pm.separator(st='in', width=160, height=8)
@@ -320,12 +320,31 @@ class densityUI(object):
             with pm.columnLayout(width=162):
                 with pm.rowLayout(nc=2):
                     pm.text(l='Pixels Per Unit:')
-                    self.texelDensity = pm.floatField(v=1.0)
-                pm.button(l='Set Texel Density')
+                    self.texelDensity = pm.floatField(v=1)
+
+                with pm.rowColumnLayout(nc=2):
+                    pm.button(l='Set Density', c=self.setDensity)
+                    pm.button(l='Sample Density', c=self.sampleDensity)
+
+    def setDensity(self, *args):
+        sel = pm.selected()
+
+        for i in sel:
+            txScale = self.texelDensity.getValue() / self.opts.width.getValue()
+            pm.unfold(i, i=0, us=True, applyToShell=False, s=txScale)
+
+    def sampleDensity(self, *args):
+        sel = pm.ls(pm.polyListComponentConversion(pm.selected(), tf=True), fl=True)
+
+        ratios = []
+        for i in sel:
+            ratios.append(math.sqrt(i.getUVArea() / i.getArea()))
+        ratio = (sum(ratios) / len(sel)) * self.opts.width.getValue()
+        self.texelDensity.setValue(ratio)
 
 
 class snapshotUI(object):
-    def __init__(self):
+    def __init__(self, opts):
         with pm.frameLayout(l='UV Snapshot:', cll=True, cl=False, bs='out'):
             with pm.columnLayout(width=162):
                 pass
