@@ -70,6 +70,14 @@ class UI(object):
 
         window.show()
 
+    @staticmethod
+    def dumpSettings():
+        pass
+
+    @staticmethod
+    def loadSettings():
+        pass
+
 
 class globalOptions(object):
     def __init__(self):
