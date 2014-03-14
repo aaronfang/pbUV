@@ -81,6 +81,7 @@ class UI(object):
 
 class globalOptions(object):
     def __init__(self):
+        resPresets = [4096, 2048, 1024, 512, 256, 128, 64, 32]
         with pm.frameLayout(l='Options', cll=True, cl=False, bs='out'):
             with pm.columnLayout():
                 pm.text('Map Size:')
@@ -88,10 +89,14 @@ class globalOptions(object):
                 with pm.rowColumnLayout(nc=3, cw=[20, 60]):
                     pm.text(l='Width:')
                     self.width = pm.intField(v=1024, width=42)
-                    pm.optionMenu()
+                    with pm.optionMenu():
+                        for i in resPresets:
+                            pm.menuItem(l=i)
                     pm.text(l='Height:')
                     self.height = pm.intField(v=1024, width=42)
-                    pm.optionMenu()
+                    with pm.optionMenu():
+                        for i in resPresets:
+                            pm.menuItem(l=i)
                 pm.button(l='Get Map Size')
 
                 pm.separator(st='in', width=160, height=8)
