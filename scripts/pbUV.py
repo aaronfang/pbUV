@@ -1,5 +1,7 @@
-import math
 # import pickle
+from pymel.util.common import path
+import math
+import os
 import pymel.core as pm
 
 
@@ -350,9 +352,31 @@ class densityUI(object):
 
 class snapshotUI(object):
     def __init__(self, opts):
+        self.opts = opts
         with pm.frameLayout(l='UV Snapshot:', cll=True, cl=False, bs='out'):
             with pm.columnLayout(width=162):
-                pass
+                self.path = pm.textFieldButtonGrp(l='Path:', bl='...', cw3=[28, 104, 32], bc=self.setPath)
+                self.col = pm.colorSliderGrp(l='Color:', cw3=[32, 48, 74])
+                with pm.rowLayout(nc=2):
+                    self.of = pm.checkBox(l='Open File')
+                    self.aa = pm.checkBox(l='Anti-Alias', v=True)
+                pm.button(l='Save Snapshot', width=156, c=self.snapShot)
+
+    def setPath(self, *args):
+        snapPath = pm.fileDialog2(fm=0, okc='Save', ff='Targa (*.tga);;PNG (*.png);;JPEG (*.jpg);;TIFF (*.tif)')
+        if snapPath:
+            self.path.setText(snapPath[0])
+
+    def snapShot(self, *args):
+        snapPath = path(self.path.getText())
+        col = [i * 255 for i in self.col.getRgbValue()]
+
+        pm.uvSnapshot(name=snapPath, ff=snapPath.ext[1:],
+                      aa=self.aa.getValue(), r=col[0], g=col[1], b=col[2], o=True,
+                      xr=self.opts.width.getValue(), yr=self.opts.height.getValue())
+
+        if self.of.getValue():
+            os.startfile(snapPath)
 
 
 # ToolBar UI Stuff
