@@ -7,9 +7,9 @@ import pymel.core as pm
 
 # Decorators
 def moveFix(function):
-    '''
-    Fixs "Some items cannot be moved in the 3D view" Warning
-    '''
+    """
+    Fix "Some items cannot be moved in the 3D view" Warning
+    """
     def decoratedFunction(*args, **kwargs):
         currentTool = pm.currentCtx()
         selectTool = pm.melGlobals['gSelect']
@@ -493,7 +493,7 @@ class unfoldUI(toolsUI):
             pm.popupMenu(button=3, p=unfold, pmc=lambda *args: pm.mel.performUnfold(1))
 
             unfoldSep = pm.iconTextButton(image1='textureEditorUnfoldUVs.png',
-                                          ann=pm.mel.uiRes('m_textureWindowCreateToolBar.kUnfoldAnnot'),
+                                          ann='Unfold selected UVs along U or V',
                                           c=lambda *args: self.unfoldSepCmd(2))
             pm.popupMenu(button=3, p=unfoldSep, pmc=lambda *args: self.unfoldSepCmd(1))
 
@@ -710,7 +710,7 @@ class layoutUI(toolsUI):
                                            commandRepeatable=True)
             pm.popupMenu(button=3, parent=layoutUorV, pmc=lambda *args: self.UorV(1))
 
-    def UorV(self, val):
+    def UorV(self, val):  # FIXME
         if val == 0:
             pass
         else:
