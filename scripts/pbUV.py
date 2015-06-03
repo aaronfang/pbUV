@@ -1,4 +1,3 @@
-# import pickle
 from pymel.util.common import path
 import math
 import os
@@ -6,20 +5,22 @@ import pymel.core as pm
 
 
 # Decorators
-def moveFix(function):
+def move_fix(function):
     """
     Fix "Some items cannot be moved in the 3D view" Warning
     """
-    def decoratedFunction(*args, **kwargs):
-        currentTool = pm.currentCtx()
-        selectTool = pm.melGlobals['gSelect']
-        if currentTool != selectTool:
-            pm.setToolTo(selectTool)
+
+    def decorated_function(*args, **kwargs):
+        currenttool = pm.currentCtx()
+        selecttool = pm.melGlobals['gSelect']
+        if currenttool != selecttool:
+            pm.setToolTo(selecttool)
             function(*args, **kwargs)
-            pm.setToolTo(currentTool)
+            pm.setToolTo(currenttool)
         else:
             function(*args, **kwargs)
-    return decoratedFunction
+
+    return decorated_function
 
 
 class UI(object):
@@ -37,53 +38,53 @@ class UI(object):
         except:
             pane = pm.paneLayout('textureEditorPanel', paneSize=[1, 1, 1], cn='vertical2')
 
-        uvTextureViews = pm.getPanel(scriptType='polyTexturePlacementPanel')
-        if len(uvTextureViews):
-            pm.scriptedPanel(uvTextureViews[0], e=True, unParent=True)
+        uvtextureviews = pm.getPanel(scriptType='polyTexturePlacementPanel')
+        if len(uvtextureviews):
+            pm.scriptedPanel(uvtextureviews[0], e=True, unParent=True)
 
         with pm.columnLayout(p=pane):
-            transformUI()
-            opts = globalOptions()
-            setEditorUI()
-            densityUI(opts)
-            snapshotUI(opts)
+            TransformUI()
+            opts = GlobalOptions()
+            SetEditorUI()
+            DensityUI(opts)
+            SnapshotUI(opts)
 
-        pm.scriptedPanel(uvTextureViews[0], e=True, parent=pane)
+        pm.scriptedPanel(uvtextureviews[0], e=True, parent=pane)
 
         # Replace Default UV Editor Toolbar
-        flowLayout = pm.melGlobals['gUVTexEditToolBar']
-        frameLayout = pm.flowLayout(flowLayout, q=True, p=True)
-        frameLayout = pm.uitypes.FrameLayout(frameLayout)
-        pm.deleteUI(flowLayout)
+        flowlayout = pm.melGlobals['gUVTexEditToolBar']
+        framelayout = pm.flowLayout(flowlayout, q=True, p=True)
+        framelayout = pm.uitypes.FrameLayout(framelayout)
+        pm.deleteUI(flowlayout)
 
-        flowLayout = pm.flowLayout(p=frameLayout)
-        tools01UI(flowLayout)
-        cutSewUI(flowLayout)
-        unfoldUI(flowLayout)
-        alignUI(flowLayout)
-        pushUI(flowLayout)
-        snapUI(flowLayout)
-        layoutUI(flowLayout)
-        isolateUI(flowLayout, uvTextureViews[0])
-        opts01UI(flowLayout, uvTextureViews[0])
-        opts02UI(flowLayout, uvTextureViews[0])
-        opts03UI(flowLayout, uvTextureViews[0])
-        manipUI(flowLayout)
+        flowlayout = pm.flowLayout(p=framelayout)
+        Tools01UI(flowlayout)
+        CutSewUI(flowlayout)
+        UnfoldUI(flowlayout)
+        AlignUI(flowlayout)
+        PushUI(flowlayout)
+        SnapUI(flowlayout)
+        LayoutUI(flowlayout)
+        IsolateUI(flowlayout, uvtextureviews[0])
+        Opts01UI(flowlayout, uvtextureviews[0])
+        Opts02UI(flowlayout, uvtextureviews[0])
+        Opts03UI(flowlayout, uvtextureviews[0])
+        ManipUI(flowlayout)
 
         window.show()
 
     @staticmethod
-    def dumpSettings():
+    def dump_settings():
         pass
 
     @staticmethod
-    def loadSettings():
+    def load_settings():
         pass
 
 
-class globalOptions(object):
+class GlobalOptions(object):
     def __init__(self):
-        resPresets = [4096, 2048, 1024, 512, 256, 128, 64, 32]
+        respresets = [4096, 2048, 1024, 512, 256, 128, 64, 32]
         with pm.frameLayout(l='Options', cll=True, cl=False, bs='out'):
             with pm.columnLayout():
                 pm.text('Map Size:')
@@ -92,24 +93,25 @@ class globalOptions(object):
                     pm.text(l='Width:')
                     self.width = pm.intField(v=1024, width=42)
                     with pm.optionMenu():
-                        for i in resPresets:
+                        for i in respresets:
                             pm.menuItem(l=i)
                     pm.text(l='Height:')
                     self.height = pm.intField(v=1024, width=42)
                     with pm.optionMenu():
-                        for i in resPresets:
+                        for i in respresets:
                             pm.menuItem(l=i)
                 pm.button(l='Get Map Size')
 
                 pm.separator(st='in', width=160, height=8)
                 with pm.columnLayout():
                     self.compSpace = pm.checkBox(l='Retain Component Spaceing',
-                                                 cc=lambda *args: pm.texMoveContext('texMoveContext', e=True, scr=self.compSpace.getValue()),
+                                                 cc=lambda *args: pm.texMoveContext('texMoveContext', e=True,
+                                                                                    scr=self.compSpace.getValue()),
                                                  v=pm.texMoveContext('texMoveContext', q=True, scr=True))
                     self.pixelUnits = pm.checkBox(l='Transform In Pixels')
 
 
-class transformUI(object):
+class TransformUI(object):
     def __init__(self):
         with pm.frameLayout(l='Transform:', cll=True, cl=False, bs='out'):
             with pm.columnLayout():
@@ -124,9 +126,9 @@ class transformUI(object):
                     pm.iconTextButton(image1='pbUV/tRot90CW.png', c=lambda *args: self.rotate(angle=90, dir='cw'),
                                       commandRepeatable=True)
 
-                    flipUV = pm.iconTextButton(image1='pbUV/tFlipUV.png', c=lambda *args: self.flip(axis='u'),
+                    flipuv = pm.iconTextButton(image1='pbUV/tFlipUV.png', c=lambda *args: self.flip(axis='u'),
                                                commandRepeatable=True)
-                    pm.popupMenu(button=3, p=flipUV, pmc=lambda *args: self.flip(axis='v'))
+                    pm.popupMenu(button=3, p=flipuv, pmc=lambda *args: self.flip(axis='v'))
                     pm.iconTextButton(image1='pbUV/tTranslateLeft.png', c=lambda *args: self.move(u=-1),
                                       commandRepeatable=True)
                     pm.iconTextButton(image1='pbUV/tTranslateDown.png', c=lambda *args: self.move(v=-1),
@@ -148,21 +150,22 @@ class transformUI(object):
                 pm.separator(st='in', width=160, height=8)
 
                 with pm.rowLayout(nc=2):
-                    pm.button(l='Orient Edge', c=self.orientEdge)
-                    pm.button(l='Orient Bounds', c=self.orientBounds)
+                    pm.button(l='Orient Edge', c=self.orient_edge)
+                    pm.button(l='Orient Bounds', c=self.orient_bounds)
 
                 pm.separator(st='in', width=160, height=8)
 
                 with pm.columnLayout(cal='left'):
                     pm.text(l='Pivot:')
-                    self.pivType = pm.radioButtonGrp(nrb=2, labelArray2=['Selection', 'Custom'], cw2=[64, 64], cc=self._pivChange, sl=1)
+                    self.pivType = pm.radioButtonGrp(nrb=2, labelArray2=['Selection', 'Custom'], cw2=[64, 64],
+                                                     cc=self._piv_change, sl=1)
                     with pm.rowLayout(nc=3, en=False) as self.pivPos:
                         pm.text('POS:')
                         self.pivU = pm.floatField()
                         self.pivV = pm.floatField()
-                    self.sampleSel = pm.button(l='Sample Selection', height=18, en=False, c=self.sampleSelCmd)
+                    self.sampleSel = pm.button(l='Sample Selection', height=18, en=False, c=self.sample_sel_cmd)
 
-    def _pivChange(self, *args):
+    def _piv_change(self, *args):
         if self.pivType.getSelect() == 1:
             self.pivPos.setEnable(False)
             self.sampleSel.setEnable(False)
@@ -170,20 +173,20 @@ class transformUI(object):
             self.pivPos.setEnable(True)
             self.sampleSel.setEnable(True)
 
-    def pivLoc(self, *args):
+    def piv_loc(self, *args):
         if self.pivType.getSelect() == 1:
             uvs = UV()
-            return uvs.getPivot()
+            return uvs.get_pivot()
         else:
             return self.pivU.getValue(), self.pivV.getValue()
 
-    def sampleSelCmd(self, *args):
+    def sample_sel_cmd(self, *args):
         uvs = UV()
-        piv = uvs.getPivot()
+        piv = uvs.get_pivot()
         self.pivU.setValue(piv[0])
         self.pivV.setValue(piv[1])
 
-    @moveFix
+    @move_fix
     def move(self, u=0, v=0):
         pm.polyEditUV(uValue=self.manipValue.getValue() * u, vValue=self.manipValue.getValue() * v)
 
@@ -196,7 +199,7 @@ class transformUI(object):
         elif dir == 'cw':
             dir = -1
 
-        pm.polyEditUV(pu=self.pivLoc()[0], pv=self.pivLoc()[1], angle=angle * dir)
+        pm.polyEditUV(pu=self.piv_loc()[0], pv=self.piv_loc()[1], angle=angle * dir)
 
     def scale(self, axis=None, flip=False):
         if axis == 'u':
@@ -209,7 +212,7 @@ class transformUI(object):
             u = self.manipValue.getValue()
             v = self.manipValue.getValue()
 
-        pm.polyEditUV(pu=self.pivLoc()[0], pv=self.pivLoc()[1], su=u, sv=v)
+        pm.polyEditUV(pu=self.piv_loc()[0], pv=self.piv_loc()[1], su=u, sv=v)
 
     def flip(self, axis='u'):
         if axis == 'u':
@@ -219,33 +222,33 @@ class transformUI(object):
             u = 1
             v = -1
 
-        pm.polyEditUV(pu=self.pivLoc()[0], scaleU=u, scaleV=v)
+        pm.polyEditUV(pu=self.piv_loc()[0], scaleU=u, scaleV=v)
 
-    def orientEdge(self, *args):
+    def orient_edge(self, *args):  # FIXME
         pass
 
-    def orientBounds(self, *args):
+    def orient_bounds(self, *args):  # FIXME
         pass
 
 
-class setEditorUI(object):
+class SetEditorUI(object):
     def __init__(self):
         with pm.frameLayout(l='Set Editor:', cll=True, cl=False, bs='out') as setUI:
             with pm.columnLayout(width=162):
                 self.uvs = pm.textScrollList(w=160, h=72,
-                                             sc=self.selectSet,
-                                             dcc=self.renameSet,
-                                             dkc=self.deleteSet)
-                self.updateSets()
+                                             sc=self.select_set,
+                                             dcc=self.rename_set,
+                                             dkc=self.delete_set)
+                self.update_sets()
 
                 with pm.rowLayout(nc=3):
-                    pm.button(l='New', c=self.addSet)
-                    pm.button(l='Copy', c=self.dupSet)
+                    pm.button(l='New', c=self.add_set)
+                    pm.button(l='Copy', c=self.dup_set)
                     pm.button(l='UV Linking', c=lambda *args: pm.mel.UVCentricUVLinkingEditor())
 
-        pm.scriptJob(event=['SelectionChanged', self.updateSets], protected=True, p=setUI)
+        pm.scriptJob(event=['SelectionChanged', self.update_sets], protected=True, p=setUI)
 
-    def updateSets(self, *args):
+    def update_sets(self, *args):
         self.uvs.removeAll()
         sel = pm.selected()
 
@@ -256,11 +259,11 @@ class setEditorUI(object):
             sel = [sel[0].node()]
 
         try:
-            uvSets = []
+            uvsets = []
             for obj in sel:
                 for uvSet in obj.getUVSetNames():
-                    uvSets.append('{0} | {1}'.format(obj.getParent(), uvSet))
-            self.uvs.append(uvSets)
+                    uvsets.append('{0} | {1}'.format(obj.getParent(), uvSet))
+            self.uvs.append(uvsets)
         except:
             pass
 
@@ -270,57 +273,57 @@ class setEditorUI(object):
         except:
             pass
 
-    def selectSet(self, *args):
-        uvSet = self.uvs.getSelectItem()[0].split(' | ')
-        pm.polyUVSet(uvSet[0], currentUVSet=True, uvSet=uvSet[1])
+    def select_set(self, *args):
+        uvset = self.uvs.getSelectItem()[0].split(' | ')
+        pm.polyUVSet(uvset[0], currentUVSet=True, uvSet=uvset[1])
 
-    def renameSet(self, *args):
-        bDialog = pm.promptDialog(title='Rename UVSet',
+    def rename_set(self, *args):
+        bdialog = pm.promptDialog(title='Rename UVSet',
                                   message='Enter New UvSet Name:',
                                   button=['OK', 'Cancel'],
                                   defaultButton='OK',
                                   cancelButton='Cancel',
                                   dismissString='Cancel')
-        if bDialog == 'OK':
+        if bdialog == 'OK':
             uvSet = self.uvs.getSelectItem()[0].split(' | ')
             pm.polyUVSet(uvSet[0], rename=True, uvSet=uvSet[1], newUVSet=pm.promptDialog(q=True, text=True))
-            self.updateSets()
+            self.update_sets()
 
-    def deleteSet(self, *args):
-        uvSet = self.uvs.getSelectItem()[0].split(' | ')
+    def delete_set(self, *args):
+        uvset = self.uvs.getSelectItem()[0].split(' | ')
         try:
-            pm.polyUVSet(uvSet[0], delete=True, uvSet=uvSet[1])
-            self.updateSets()
+            pm.polyUVSet(uvset[0], delete=True, uvSet=uvset[1])
+            self.update_sets()
         except RuntimeError:
             pm.warning('The defualt uv set cannot be deleted.')
-            self.updateSets()
+            self.update_sets()
 
-    def addSet(self, *args):
-        uvSet = self.uvs.getSelectItem()[0].split(' | ')
-        bDialog = pm.promptDialog(title='Add New UVSet',
+    def add_set(self, *args):
+        uvset = self.uvs.getSelectItem()[0].split(' | ')
+        bdialog = pm.promptDialog(title='Add New UVSet',
                                   message='Enter New UVSet Name:',
                                   button=['OK', 'Cancel'],
                                   defaultButton='OK',
                                   cancelButton='Cancel',
                                   dismissString='Cancel')
-        if bDialog == 'OK':
-            pm.polyUVSet(uvSet[0], create=True, uvSet=pm.promptDialog(q=True, text=True))
-            self.updateSets()
+        if bdialog == 'OK':
+            pm.polyUVSet(uvset[0], create=True, uvSet=pm.promptDialog(q=True, text=True))
+            self.update_sets()
 
-    def dupSet(self, *args):
-        uvSet = self.uvs.getSelectItem()[0].split(' | ')
-        bDialog = pm.promptDialog(title='Duplicate UVSet',
+    def dup_set(self, *args):
+        uvset = self.uvs.getSelectItem()[0].split(' | ')
+        bdialog = pm.promptDialog(title='Duplicate UVSet',
                                   message='Enter New UVSet Name:',
                                   button=['OK', 'Cancel'],
                                   defaultButton='OK',
                                   cancelButton='Cancel',
                                   dismissString='Cancel')
-        if bDialog == 'OK':
-            pm.polyUVSet(uvSet[0], copy=True, uvSet=uvSet[1], newUVSet=pm.promptDialog(q=True, text=True))
-            self.updateSets()
+        if bdialog == 'OK':
+            pm.polyUVSet(uvset[0], copy=True, uvSet=uvset[1], newUVSet=pm.promptDialog(q=True, text=True))
+            self.update_sets()
 
 
-class densityUI(object):
+class DensityUI(object):
     def __init__(self, opts):
         self.opts = opts
         with pm.frameLayout(l='Texel Density:', cll=True, cl=False, bs='out'):
@@ -330,17 +333,17 @@ class densityUI(object):
                     self.texelDensity = pm.floatField(v=1)
 
                 with pm.rowColumnLayout(nc=2):
-                    pm.button(l='Set Density', c=self.setDensity)
-                    pm.button(l='Sample Density', c=self.sampleDensity)
+                    pm.button(l='Set Density', c=self.set_density)
+                    pm.button(l='Sample Density', c=self.sample_density)
 
-    def setDensity(self, *args):
+    def set_density(self, *args):
         sel = pm.selected()
 
         for i in sel:
-            txScale = self.texelDensity.getValue() / self.opts.width.getValue()
-            pm.unfold(i, i=0, us=True, applyToShell=False, s=txScale)
+            txscale = self.texelDensity.getValue() / self.opts.width.getValue()
+            pm.unfold(i, i=0, us=True, applyToShell=False, s=txscale)
 
-    def sampleDensity(self, *args):
+    def sample_density(self, *args):
         sel = pm.ls(pm.polyListComponentConversion(pm.selected(), tf=True), fl=True)
 
         ratios = []
@@ -350,41 +353,41 @@ class densityUI(object):
         self.texelDensity.setValue(ratio)
 
 
-class snapshotUI(object):
+class SnapshotUI(object):
     def __init__(self, opts):
         self.opts = opts
         with pm.frameLayout(l='UV Snapshot:', cll=True, cl=False, bs='out'):
             with pm.columnLayout(width=162):
-                self.path = pm.textFieldButtonGrp(l='Path:', bl='...', cw3=[28, 104, 32], bc=self.setPath)
+                self.path = pm.textFieldButtonGrp(l='Path:', bl='...', cw3=[28, 104, 32], bc=self.set_path)
                 self.col = pm.colorSliderGrp(l='Color:', cw3=[32, 48, 74])
                 with pm.rowLayout(nc=2):
                     self.of = pm.checkBox(l='Open File')
                     self.aa = pm.checkBox(l='Anti-Alias', v=True)
-                pm.button(l='Save Snapshot', width=156, c=self.snapShot)
+                pm.button(l='Save Snapshot', width=156, c=self.snap_shot)
 
-    def setPath(self, *args):
-        snapPath = pm.fileDialog2(fm=0, okc='Save', ff='Targa (*.tga);;PNG (*.png);;JPEG (*.jpg);;TIFF (*.tif)')
-        if snapPath:
-            self.path.setText(snapPath[0])
+    def set_path(self, *args):
+        snappath = pm.fileDialog2(fm=0, okc='Save', ff='Targa (*.tga);;PNG (*.png);;JPEG (*.jpg);;TIFF (*.tif)')
+        if snappath:
+            self.path.setText(snappath[0])
 
-    def snapShot(self, *args):
-        snapPath = path(self.path.getText())
+    def snap_shot(self, *args):
+        snappath = path(self.path.getText())
         col = [i * 255 for i in self.col.getRgbValue()]
 
-        pm.uvSnapshot(name=snapPath, ff=snapPath.ext[1:],
+        pm.uvSnapshot(name=snappath, ff=snappath.ext[1:],
                       aa=self.aa.getValue(), r=col[0], g=col[1], b=col[2], o=True,
                       xr=self.opts.width.getValue(), yr=self.opts.height.getValue())
 
         if self.of.getValue():
-            os.startfile(snapPath)
+            os.startfile(snappath)
 
 
 # ToolBar UI Stuff
-class toolsUI(object):
+class ToolsUI(object):
     def __init__(self, par):
-        self.sep = pm.iconTextButton(image1='textureEditorOpenBar.png', p=par, c=self.toggleVisible)
+        self.sep = pm.iconTextButton(image1='textureEditorOpenBar.png', p=par, c=self.toggle_visible)
 
-    def toggleVisible(self, *args):
+    def toggle_visible(self, *args):
         if self.layout.getVisible():
             self.layout.setVisible(False)
             self.sep.setImage1('textureEditorCloseBar.png')
@@ -393,9 +396,9 @@ class toolsUI(object):
             self.sep.setImage1('textureEditorOpenBar.png')
 
 
-class tools01UI(toolsUI):
+class Tools01UI(ToolsUI):
     def __init__(self, par):
-        toolsUI.__init__(self, par)
+        ToolsUI.__init__(self, par)
         with pm.gridLayout(p=par, nc=3, cwh=[26, 26]) as self.layout:
             pm.toolButton(dcc=lambda *args: pm.toolPropertyWindow,
                           collection='toolCluster',
@@ -428,9 +431,9 @@ class tools01UI(toolsUI):
                           width=24, height=24)
 
 
-class cutSewUI(toolsUI):
+class CutSewUI(ToolsUI):
     def __init__(self, par):
-        toolsUI.__init__(self, par)
+        ToolsUI.__init__(self, par)
         with pm.gridLayout(p=par, nc=3, cwh=[26, 26]) as self.layout:
             pm.iconTextButton(image1='cutUV.png',
                               c=lambda *args: pm.polyMapCut(),
@@ -443,21 +446,22 @@ class cutSewUI(toolsUI):
                               commandRepeatable=True)
 
             pm.iconTextButton(image1='tearface', ann='Tear Off Selected Face From UVs',
-                              c=self.tearFace,
+                              c=self.tear_face,
                               commandRepeatable=True)
 
-            sewUV = pm.iconTextButton(image1='sewUV.png',
-                                      c=self.sewUV, commandRepeatable=True,
+            sewuv = pm.iconTextButton(image1='sew_uv.png',
+                                      c=self.sew_uv, commandRepeatable=True,
                                       ann=pm.mel.uiRes('m_textureWindowCreateToolBar.kSewSelectedUVsTogetherAnnot'))
-            pm.popupMenu(button=3, p=sewUV, pmc=lambda *args: pm.mel.performPolyMergeUV(1))
+            pm.popupMenu(button=3, p=sewuv, pmc=lambda *args: pm.mel.performPolyMergeUV(1))
 
-            moveSewUV = pm.iconTextButton(image1='moveSewUV.png',
+            movesewuv = pm.iconTextButton(image1='moveSewUV.png',
                                           c=lambda *args: pm.mel.performPolyMapSewMove(0),
                                           commandRepeatable=True,
-                                          ann=pm.mel.uiRes('m_textureWindowCreateToolBar.kMoveAndSewSelectedEdgesAnnot'))
-            pm.popupMenu(button=3, p=moveSewUV, pmc=lambda *args: pm.mel.performPolyMapSewMove(1))
+                                          ann=pm.mel.uiRes(
+                                              'm_textureWindowCreateToolBar.kMoveAndSewSelectedEdgesAnnot'))
+            pm.popupMenu(button=3, p=movesewuv, pmc=lambda *args: pm.mel.performPolyMapSewMove(1))
 
-    def sewUV(self):  # FIXME
+    def sew_uv(self):  # FIXME
         edges = pm.filterExpand(ex=False, selectionMask=32)
         uvs = pm.filterExpand(ex=False, selectionMask=35)
         if edges:
@@ -465,9 +469,9 @@ class cutSewUI(toolsUI):
         if uvs:
             pm.mel.performPolyMergeUV(0)
 
-    def tearFace(self):
+    def tear_face(self):
         sel = pm.selected()
-        moveTool = pm.melGlobals['gMove']
+        movetool = pm.melGlobals['gMove']
         if all(isinstance(i, pm.MeshFace) for i in sel):
             if len(sel) == 1:
                 pm.polyMapCut(sel)
@@ -479,12 +483,12 @@ class cutSewUI(toolsUI):
                 pm.polyMapSewMove(sewSel, nf=10, lps=0, ch=1)
                 sel = pm.polyListComponentConversion(sel, ff=True, tuv=True)
                 pm.select(sel)
-            pm.setToolTo(moveTool)
+            pm.setToolTo(movetool)
 
 
-class unfoldUI(toolsUI):
+class UnfoldUI(ToolsUI):
     def __init__(self, par):
-        toolsUI.__init__(self, par)
+        ToolsUI.__init__(self, par)
         with pm.gridLayout(p=par, nc=2, cwh=[26, 26]) as self.layout:
             unfold = pm.iconTextButton(image1='textureEditorUnfoldUVs.png',
                                        ann=pm.mel.uiRes('m_textureWindowCreateToolBar.kUnfoldAnnot'),
@@ -492,22 +496,22 @@ class unfoldUI(toolsUI):
                                        commandRepeatable=True)
             pm.popupMenu(button=3, p=unfold, pmc=lambda *args: pm.mel.performUnfold(1))
 
-            unfoldSep = pm.iconTextButton(image1='textureEditorUnfoldUVs.png',
+            unfoldsep = pm.iconTextButton(image1='textureEditorUnfoldUVs.png',
                                           ann='Unfold selected UVs along U or V',
-                                          c=lambda *args: self.unfoldSepCmd(2))
-            pm.popupMenu(button=3, p=unfoldSep, pmc=lambda *args: self.unfoldSepCmd(1))
+                                          c=lambda *args: self.unfold_sep_cmd(2))
+            pm.popupMenu(button=3, p=unfoldsep, pmc=lambda *args: self.unfold_sep_cmd(1))
 
-            relaxUV = pm.iconTextButton(image1='relaxUV.png',
+            relaxuv = pm.iconTextButton(image1='relaxUV.png',
                                         ann=pm.mel.uiRes('m_textureWindowCreateToolBar.kRelaxUVsAnnot'),
                                         c=lambda *args: pm.mel.performPolyUntangleUV('relax', 0))
-            pm.popupMenu(button=3, p=relaxUV, pmc=lambda *args: pm.mel.performPolyUntangleUV('relax', 1))
+            pm.popupMenu(button=3, p=relaxuv, pmc=lambda *args: pm.mel.performPolyUntangleUV('relax', 1))
 
             pm.iconTextButton(image='Null',
-                              c=lambda *args: self.matchShell(0.01),  # FIXME maxRange stuff
+                              c=lambda *args: self.match_shell(0.01),  # FIXME maxRange stuff
                               commandRepeatable=True,
                               ann='Match Selected Shell to closest Shell')
 
-    def unfoldSepCmd(self, axis):
+    def unfold_sep_cmd(self, axis):
         pm.unfold(i=pm.optionVar['unfoldIterations'],
                   ss=pm.optionVar['unfoldStopThreshold'],
                   gb=pm.optionVar['unfoldGlobalBlend'],
@@ -517,93 +521,93 @@ class unfoldUI(toolsUI):
                   oa=axis,
                   useScale=False)
 
-    def matchShell(self, maxRange):  # FIXME MAX Range set
+    def match_shell(self, maxrange):  # FIXME MAX Range set
 
-        snapUVs = pm.ls(pm.polyListComponentConversion(tuv=True), sl=True, fl=True)  # getUVs to match
+        snapuvs = pm.ls(pm.polyListComponentConversion(tuv=True), sl=True, fl=True)  # getUVs to match
 
         objs = [i.getShape() for i in pm.ls(hl=True, fl=True)]
-        allUVs = pm.ls(pm.polyListComponentConversion(objs, tuv=True), fl=True)
-        allUVs = sorted(set(allUVs) - set(snapUVs))  # get all uvs and subtract from snap uvs
+        alluvs = pm.ls(pm.polyListComponentConversion(objs, tuv=True), fl=True)
+        alluvs = sorted(set(alluvs) - set(snapuvs))  # get all uvs and subtract from snap uvs
 
-        snapPos = [pm.polyEditUV(i, q=True) for i in snapUVs]  # Get pos for snap and all
-        allPos = [pm.polyEditUV(i, q=True) for i in allUVs]
+        snappos = [pm.polyEditUV(i, q=True) for i in snapuvs]  # Get pos for snap and all
+        allpos = [pm.polyEditUV(i, q=True) for i in alluvs]
 
-        for i in range(len(snapUVs)):
-            inRange = []
-            for j in range(len(allUVs)):
-                x = snapPos[i][0] - allPos[j][0]
-                y = snapPos[i][1] - allPos[j][1]
+        for i in range(len(snapuvs)):
+            inrange = []
+            for j in range(len(alluvs)):
+                x = snappos[i][0] - allpos[j][0]
+                y = snappos[i][1] - allpos[j][1]
                 dist = math.sqrt((x ** 2) + (y ** 2))
-                if dist < maxRange:
-                    inRange.append((allPos[j], dist))
+                if dist < maxrange:
+                    inrange.append((allpos[j], dist))
 
-            if inRange:
-                inRange = min(inRange, key=lambda x: x[1])
-                pm.polyEditUV(snapUVs[i], u=inRange[0][0], v=inRange[0][1], r=False)
+            if inrange:
+                inrange = min(inrange, key=lambda x: x[1])
+                pm.polyEditUV(snapuvs[i], u=inrange[0][0], v=inrange[0][1], r=False)
 
 
-class alignUI(toolsUI):
+class AlignUI(ToolsUI):
     def __init__(self, par):
-        toolsUI.__init__(self, par)
+        ToolsUI.__init__(self, par)
         with pm.gridLayout(p=par, nc=3, cwh=[26, 26]) as self.layout:
             pm.iconTextButton(image1='NS_alUVleft.bmp',
-                              c=lambda *args: self.alignShells('left'),
+                              c=lambda *args: self.align_shells('left'),
                               commandRepeatable=True)
             pm.iconTextButton(image1='NS_alUVCenterU.bmp',
-                              c=lambda *args: self.alignShells('centerU'),
+                              c=lambda *args: self.align_shells('centerU'),
                               commandRepeatable=True)
             pm.iconTextButton(image1='NS_alUVRight.bmp',
-                              c=lambda *args: self.alignShells('right'),
+                              c=lambda *args: self.align_shells('right'),
                               commandRepeatable=True)
 
             pm.iconTextButton(image1='NS_alUVTop.bmp',
-                              c=lambda *args: self.alignShells('top'),
+                              c=lambda *args: self.align_shells('top'),
                               commandRepeatable=True)
             pm.iconTextButton(image1='NS_alUVCenterV.bmp',
-                              c=lambda *args: self.alignShells('centerV'),
+                              c=lambda *args: self.align_shells('centerV'),
                               commandRepeatable=True)
             pm.iconTextButton(image1='NS_alUVBottom.bmp',
-                              c=lambda *args: self.alignShells('bottom'),
+                              c=lambda *args: self.align_shells('bottom'),
                               commandRepeatable=True)
 
-    @moveFix
-    def alignShells(self, align):
+    @move_fix
+    def align_shells(self, align):
         sel = UV()
-        sel.getShells()
+        sel.get_shells()
 
-        shellsUVs = []
+        shellsuvs = []
         for shell in sel.shells:
             for uv in shell.uvs:
-                shellsUVs.append(uv)
+                shellsuvs.append(uv)
 
-        allUVs = UV(shellsUVs)
-        allUVs.getBounds()
+        alluvs = UV(shellsuvs)
+        alluvs.get_bounds()
 
         for shell in sel.shells:
             if align == 'left':
-                pm.polyEditUV(shell.uvs, u=allUVs.xMin - shell.xMin)
+                pm.polyEditUV(shell.uvs, u=alluvs.xMin - shell.xMin)
             elif align == 'centerU':
-                pm.polyEditUV(shell.uvs, u=(allUVs.xMin + allUVs.xMax) / 2 - (shell.xMax + shell.xMin) / 2)
+                pm.polyEditUV(shell.uvs, u=(alluvs.xMin + alluvs.xMax) / 2 - (shell.xMax + shell.xMin) / 2)
             elif align == 'right':
-                pm.polyEditUV(shell.uvs, u=allUVs.xMin - shell.xMin)
+                pm.polyEditUV(shell.uvs, u=alluvs.xMin - shell.xMin)
 
             elif align == 'top':
-                pm.polyEditUV(shell.uvs, v=allUVs.yMax - shell.yMax)
+                pm.polyEditUV(shell.uvs, v=alluvs.yMax - shell.yMax)
             elif align == 'centerV':
-                pm.polyEditUV(shell.uvs, v=(allUVs.yMin + allUVs.yMax) / 2 - (shell.yMax + shell.xMin) / 2)
+                pm.polyEditUV(shell.uvs, v=(alluvs.yMin + alluvs.yMax) / 2 - (shell.yMax + shell.xMin) / 2)
             elif align == 'bottom':
-                pm.polyEditUV(shell.uvs, v=allUVs.yMin - shell.yMin)
+                pm.polyEditUV(shell.uvs, v=alluvs.yMin - shell.yMin)
 
 
-class pushUI(toolsUI):  # FIXME Annotations
+class PushUI(ToolsUI):  # FIXME Annotations
     def __init__(self, par):
-        toolsUI.__init__(self, par)
+        ToolsUI.__init__(self, par)
         with pm.gridLayout(p=par, nc=3, cwh=[26, 26]) as self.layout:
             pm.iconTextButton(image1='pbUV/pushMinU.png',
                               c=lambda *args: pm.mel.alignUV(1, 1, 0, 0),
                               commandRepeatable=True)
             pm.iconTextButton(image1='pbUV/pushCenterU.png',
-                              c=lambda *args: self.pushAverage('u'),
+                              c=lambda *args: self.push_average('u'),
                               commandRepeatable=True)
             pm.iconTextButton(image1='pbUV/pushMaxU.png',
                               c=lambda *args: pm.mel.alignUV(1, 0, 0, 0),
@@ -613,61 +617,61 @@ class pushUI(toolsUI):  # FIXME Annotations
                               c=lambda *args: pm.mel.alignUV(0, 0, 1, 0),
                               commandRepeatable=True)
             pm.iconTextButton(image1='pbUV/pushCenterV.png',
-                              c=lambda *args: self.pushAverage('v'))
+                              c=lambda *args: self.push_average('v'))
             pm.iconTextButton(image1='pbUV/pushMaxV.png',
                               c=lambda *args: pm.mel.alignUV(0, 0, 1, 1),
                               commandRepeatable=True)
 
-    def pushAverage(self, dir):
+    def push_average(self, dir):
         uvs = UV()
-        center = uvs.getPivot()
+        center = uvs.get_pivot()
         if dir == 'u':
             pm.polyEditUV(uvs.uvs, r=False, u=center[0])
         if dir == 'v':
             pm.polyEditUV(uvs.uvs, r=False, v=center[1])
 
 
-class snapUI(toolsUI):
+class SnapUI(ToolsUI):
     def __init__(self, par):
-        toolsUI.__init__(self, par)
+        ToolsUI.__init__(self, par)
         with pm.gridLayout(p=par, nc=3, cwh=[18, 18]) as self.layout:  # FIXME new icons, and annotations
             pm.iconTextButton(image1='NS_snapTopLeft.bmp', width=16, height=16,
-                              c=lambda *args: self.snapUVs('topLeft'),
+                              c=lambda *args: self.snap_uvs('topLeft'),
                               commandRepeatable=True)
             pm.iconTextButton(image1='NS_snapTop.bmp', width=16, height=16,
-                              c=lambda *args: self.snapUVs('topCenter'),
+                              c=lambda *args: self.snap_uvs('topCenter'),
                               commandRepeatable=True)
             pm.iconTextButton(image1='NS_snapTopRight.bmp', width=16, height=16,
-                              c=lambda *args: self.snapUVs('topRight'),
+                              c=lambda *args: self.snap_uvs('topRight'),
                               commandRepeatable=True)
 
             pm.iconTextButton(image1='NS_snapLeft.bmp', width=16, height=16,
-                              c=lambda *args: self.snapUVs('centerLeft'),
+                              c=lambda *args: self.snap_uvs('centerLeft'),
                               commandRepeatable=True)
             pm.iconTextButton(image1='NS_snapCenter.bmp', width=16, height=16,
-                              c=lambda *args: self.snapUVs('center'),
+                              c=lambda *args: self.snap_uvs('center'),
                               commandRepeatable=True)
             pm.iconTextButton(image1='NS_snapRight.bmp', width=16, height=16,
-                              c=lambda *args: self.snapUVs('centerRight'),
+                              c=lambda *args: self.snap_uvs('centerRight'),
                               commandRepeatable=True)
 
             pm.iconTextButton(image1='NS_snapBottomLeft.bmp', width=16, height=16,
-                              c=lambda *args: self.snapUVs('bottomLeft'),
+                              c=lambda *args: self.snap_uvs('bottomLeft'),
                               commandRepeatable=True)
             pm.iconTextButton(image1='NS_snapBottom.bmp', width=16, height=16,
-                              c=lambda *args: self.snapUVs('bottomCenter'),
+                              c=lambda *args: self.snap_uvs('bottomCenter'),
                               commandRepeatable=True)
             pm.iconTextButton(image1='NS_snapBottomRight.bmp', width=16, height=16,
-                              c=lambda *args: self.snapUVs('bottomRight'),
+                              c=lambda *args: self.snap_uvs('bottomRight'),
                               commandRepeatable=True)
 
-    def snapUVs(self, pos):
+    def snap_uvs(self, pos):
         uvs = UV()
 
-        piv = uvs.getPivot()
-        bounds = uvs.getBounds()
-        centerU = 0.5 - piv[0]
-        centerV = 0.5 - piv[1]
+        piv = uvs.get_pivot()
+        bounds = uvs.get_bounds()
+        centeru = 0.5 - piv[0]
+        centerv = 0.5 - piv[1]
 
         left = -bounds[0][0]
         right = 1 - bounds[0][1]
@@ -677,55 +681,55 @@ class snapUI(toolsUI):
         if pos == 'topLeft':
             pm.polyEditUV(uvs.uvs, u=left, v=top)
         if pos == 'topCenter':
-            pm.polyEditUV(uvs.uvs, u=centerU, v=top)
+            pm.polyEditUV(uvs.uvs, u=centeru, v=top)
         if pos == 'topRight':
             pm.polyEditUV(uvs.uvs, u=right, v=top)
         if pos == 'centerLeft':
-            pm.polyEditUV(uvs.uvs, u=left, v=centerV)
+            pm.polyEditUV(uvs.uvs, u=left, v=centerv)
         if pos == 'center':
-            pm.polyEditUV(uvs.uvs, u=centerU, v=centerV)
+            pm.polyEditUV(uvs.uvs, u=centeru, v=centerv)
         if pos == 'centerRight':
-            pm.polyEditUV(uvs.uvs, u=right, v=centerV)
+            pm.polyEditUV(uvs.uvs, u=right, v=centerv)
         if pos == 'bottomLeft':
             pm.polyEditUV(uvs.uvs, u=left, v=bottom)
         if pos == 'bottomCenter':
-            pm.polyEditUV(uvs.uvs, u=centerU, v=bottom)
+            pm.polyEditUV(uvs.uvs, u=centeru, v=bottom)
         if pos == 'bottomRight':
             pm.polyEditUV(uvs.uvs, u=right, v=bottom)
 
 
-class layoutUI(toolsUI):
+class LayoutUI(ToolsUI):
     def __init__(self, par):
-        toolsUI.__init__(self, par)
+        ToolsUI.__init__(self, par)
         with pm.gridLayout(p=par, nc=2, cwh=[26, 26]) as self.layout:
-            layoutButton = pm.iconTextButton(image='layoutUV.png',
+            layoutbutton = pm.iconTextButton(image='layoutUV.png',
                                              ann=pm.mel.uiRes('m_textureWindowCreateToolBar.kSelectFacesToMoveAnnot'),
                                              c=lambda *args: pm.mel.performPolyLayoutUV(0),
                                              commandRepeatable=True)
-            pm.popupMenu(button=3, parent=layoutButton, pmc=lambda *args: pm.mel.performPolyLayoutUV(1))
+            pm.popupMenu(button=3, parent=layoutbutton, pmc=lambda *args: pm.mel.performPolyLayoutUV(1))
 
-            layoutUorV = pm.iconTextButton(image='layoutUV.png',  # FIXME new image
-                                           ann='Select Faces to be moved in U or V Space',
-                                           c=lambda *args: self.UorV(0),
-                                           commandRepeatable=True)
-            pm.popupMenu(button=3, parent=layoutUorV, pmc=lambda *args: self.UorV(1))
+            layout_u_or_v = pm.iconTextButton(image='layoutUV.png',  # FIXME new image
+                                              ann='Select Faces to be moved in U or V Space',
+                                              c=lambda *args: self.u_or_v(0),
+                                              commandRepeatable=True)
+            pm.popupMenu(button=3, parent=layout_u_or_v, pmc=lambda *args: self.u_or_v(1))
 
-    def UorV(self, val):  # FIXME
+    def u_or_v(self, val):  # FIXME
         if val == 0:
             pass
         else:
             pass
 
 
-class isolateUI(toolsUI):
+class IsolateUI(ToolsUI):
     def __init__(self, par, editor):
         self.editor = editor
-        toolsUI.__init__(self, par)
+        ToolsUI.__init__(self, par)
         with pm.gridLayout(p=par, nc=2, cwh=[26, 26]) as self.layout:
             pm.iconTextCheckBox(image='uvIsolateSelect.png',
                                 ann=pm.mel.uiRes('m_textureWindowCreateToolBar.kToggleIsolateSelectModeAnnot'),
-                                onc=lambda *args: self.setIsolate(True),
-                                ofc=lambda *args: self.setIsolate(False))
+                                onc=lambda *args: self.set_isolate(True),
+                                ofc=lambda *args: self.set_isolate(False))
 
             pm.iconTextButton(image='uvIsolateSelectReset.png',
                               ann=pm.mel.uiRes('m_textureWindowCreateToolBar.kRemoveAllUVsAnnot'),
@@ -742,7 +746,7 @@ class isolateUI(toolsUI):
                               c=lambda *args: pm.mel.textureEditorIsolateSelect(2),
                               commandRepeatable=True)
 
-    def setIsolate(self, val):
+    def set_isolate(self, val):
         if val:
             pm.textureWindow(self.editor, e=True, useFaceGroup=True)
             pm.optionVar['textureWindowShaderFacesMode'] = 2
@@ -751,9 +755,9 @@ class isolateUI(toolsUI):
             pm.optionVar['textureWindowShaderFacesMode'] = 0
 
 
-class manipUI(toolsUI):
+class ManipUI(ToolsUI):
     def __init__(self, par):
-        toolsUI.__init__(self, par)
+        ToolsUI.__init__(self, par)
         with pm.columnLayout() as self.layout:
             with pm.rowLayout(nc=4):
                 pm.floatField('uvEntryFieldU', precision=3, ed=True, width=46,
@@ -764,9 +768,9 @@ class manipUI(toolsUI):
                               ann=pm.mel.uiRes('m_textureWindowCreateToolBar.kEnterValueTotransformInVAnnot'),
                               cc=lambda *args: pm.mel.textureWindowEntryCommand(0))
 
-                pm.iconTextButton(image1='uvUpdate.png',
+                pm.iconTextButton(image1='uv_update.png',
                                   ann=pm.mel.uiRes('m_textureWindowCreateToolBar.kRefreshUVValuesAnnot'),
-                                  c=self.uvUpdate,
+                                  c=self.uv_update,
                                   commandRepeatable=True)
 
                 pm.iconTextCheckBox('uvEntryTransformModeButton', image1='uvEntryToggle.png',
@@ -776,15 +780,15 @@ class manipUI(toolsUI):
                                     ofc=lambda *args: pm.mel.uvEntryTransformModeCommand())
 
             with pm.rowLayout(nc=6):
-                copyUV = pm.iconTextButton('copyUVButton', image1='copyUV.png',
+                copyuv = pm.iconTextButton('copyUVButton', image1='copyUV.png',
                                            ann=pm.mel.getRunTimeCommandAnnotation('PolygonCopy'),
                                            c=lambda *args: pm.mel.PolygonCopy())
-                pm.popupMenu('copyUVButtonPopup', button=3, p=copyUV, pmc=lambda *args: pm.mel.PolygonCopyOptions())
+                pm.popupMenu('copyUVButtonPopup', button=3, p=copyuv, pmc=lambda *args: pm.mel.PolygonCopyOptions())
 
-                pasteUV = pm.iconTextButton('pasteUVButton', image1='pasteUV.png',
+                pasteuv = pm.iconTextButton('pasteUVButton', image1='pasteUV.png',
                                             ann=pm.mel.getRunTimeCommandAnnotation('PolygonPaste'),
                                             c=lambda *args: pm.mel.PolygonPaste())
-                pm.popupMenu('pasteUVButtonPopup', button=3, p=pasteUV, pmc=lambda *args: pm.mel.PolygonPasteOptions())
+                pm.popupMenu('pasteUVButtonPopup', button=3, p=pasteuv, pmc=lambda *args: pm.mel.PolygonPasteOptions())
 
                 pm.iconTextButton('pasteUButton', image1='pasteUDisabled.png', en=False,
                                   ann=pm.mel.uiRes('m_textureWindowCreateToolBar.kPasteUValueAnnot'),
@@ -804,23 +808,25 @@ class manipUI(toolsUI):
                                   c=lambda *args: pm.mel.polyRotateUVsByVertex(),
                                   commandRepeatable=True)
 
-    def uvUpdate(self):
+    def uv_update(self):
         pm.undoInfo(swf=False)
         pm.mel.textureWindowCreateToolBar_isUVTransformed()
         pm.undoInfo(swf=True)
 
 
-class opts01UI(toolsUI):
+class Opts01UI(ToolsUI):
     def __init__(self, par, editor):
         self.editor = editor
-        toolsUI.__init__(self, par)
+        ToolsUI.__init__(self, par)
         with pm.columnLayout(p=par) as self.layout:
             with pm.rowLayout(nc=4):
                 self.imageDisplay = pm.iconTextCheckBox('imageDisplayButton', image1='imageDisplay.png',
                                                         v=pm.textureWindow(self.editor, q=True, id=True),
-                                                        cc=self.toggleImageDisplay,
-                                                        ann=pm.mel.uiRes('m_textureWindowCreateToolBar.kDisplayImageAnnot'))
-                pm.popupMenu(button=3, p=self.imageDisplay, pmc=lambda *args: pm.mel.performTextureViewImageRangeOptions(1))
+                                                        cc=self.toggle_image_display,
+                                                        ann=pm.mel.uiRes(
+                                                            'm_textureWindowCreateToolBar.kDisplayImageAnnot'))
+                pm.popupMenu(button=3, p=self.imageDisplay,
+                             pmc=lambda *args: pm.mel.performTextureViewImageRangeOptions(1))
 
                 pm.iconTextCheckBox(image1='textureEditorShadeUVs.png',
                                     value=pm.textureWindow(self.editor, q=True, displaySolidMap=True),
@@ -828,9 +834,10 @@ class opts01UI(toolsUI):
                                     ofc=lambda *args: pm.textureWindow(self.editor, e=True, displaySolidMap=False),
                                     ann=pm.mel.uiRes('m_textureWindowCreateToolBar.kOverlapAnnot'))
 
-                self.edgeColorBtn = pm.iconTextButton(image1='pbUV/opts01EdgeColor.png', c=self.edgeColCmd)
-                self.edgeColSld = pm.intSlider(min=1, max=31, value=pm.displayColor('polymesh', q=True, active=True) + 1,
-                                               dc=self.edgeColAttr)
+                self.edgeColorBtn = pm.iconTextButton(image1='pbUV/opts01EdgeColor.png', c=self.edge_col_cmd)
+                self.edgeColSld = pm.intSlider(min=1, max=31,
+                                               value=pm.displayColor('polymesh', q=True, active=True) + 1,
+                                               dc=self.edge_col_attr)
 
             with pm.rowLayout(nc=4):
                 pm.iconTextCheckBox(image1='filteredMode.png', v=pm.textureWindow(self.editor, q=True, iuf=True),
@@ -838,21 +845,23 @@ class opts01UI(toolsUI):
                                     ofc=lambda *args: pm.textureWindow(self.editor, e=True, iuf=False),
                                     ann=pm.mel.uiRes('m_textureWindowCreateToolBar.kToggleFilteredImageAnnot'))
 
-                polyOpts = pm.iconTextButton(image1='textureBorder.png', c=self.toggleTxBorder,
-                                             ann=pm.mel.uiRes('m_textureWindowCreateToolBar.kToggleTextureBordersAnnot'))
+                polyOpts = pm.iconTextButton(image1='textureBorder.png', c=self.toggle_tx_border,
+                                             ann=pm.mel.uiRes(
+                                                 'm_textureWindowCreateToolBar.kToggleTextureBordersAnnot'))
                 pm.popupMenu(button=3, p=polyOpts, pmc=lambda *args: pm.mel.CustomPolygonDisplayOptions())
 
                 self.dimImageBtn = pm.iconTextCheckBox('dimmerButton', image1='dimTexture.png',
                                                        ann=pm.mel.uiRes('m_textureWindowCreateToolBar.kDimImageAnnot'),
-                                                       onc=lambda *args: self.dimImageCmd(True),
-                                                       ofc=lambda *args: self.dimImageCmd(False),
-                                                       value=pm.textureWindow(self.editor, q=True, imageBaseColor=True) < 0.9)
+                                                       onc=lambda *args: self.dim_image_cmd(True),
+                                                       ofc=lambda *args: self.dim_image_cmd(False),
+                                                       value=pm.textureWindow(self.editor, q=True,
+                                                                              imageBaseColor=True) < 0.9)
 
                 self.dimImage = pm.floatSlider(minValue=0.0, maxValue=1.0,
                                                value=pm.textureWindow(self.editor, q=True, imageBaseColor=True)[0],
-                                               cc=self.dimImageAttr, dc=self.dimImageAttr)
+                                               cc=self.dim_image_attr, dc=self.dim_image_attr)
 
-    def toggleImageDisplay(self, *args):
+    def toggle_image_display(self, *args):
         if pm.textureWindow(self.editor, q=True, id=True):
             pm.textureWindow(self.editor, e=True, id=False)
             self.imageDisplay.setValue(False)
@@ -860,7 +869,7 @@ class opts01UI(toolsUI):
             pm.textureWindow(self.editor, e=True, id=True)
             self.imageDisplay.setValue(True)
 
-    def dimImageCmd(self, value):
+    def dim_image_cmd(self, value):
         if value:
             pm.textureWindow(self.editor, e=True, imageBaseColor=[0.5, 0.5, 0.5])
             self.dimImage.setValue(0.5)
@@ -868,7 +877,7 @@ class opts01UI(toolsUI):
             pm.textureWindow(self.editor, e=True, imageBaseColor=[1.0, 1.0, 1.0])
             self.dimImage.setValue(1.0)
 
-    def dimImageAttr(self, *args):
+    def dim_image_attr(self, *args):
         val = self.dimImage.getValue()
         pm.textureWindow(self.editor, e=True, imageBaseColor=[val, val, val])
 
@@ -877,39 +886,39 @@ class opts01UI(toolsUI):
         else:
             self.dimImageBtn.setValue(False)
 
-    def edgeColCmd(self, *args):
+    def edge_col_cmd(self, *args):
         pm.displayColor('polymesh', 16, active=True)
         self.edgeColSld.setValue(16)
 
-    def edgeColAttr(self, *args):
+    def edge_col_attr(self, *args):
         pm.displayColor('polymesh', self.edgeColSld.getValue(), active=True)
 
-    def toggleTxBorder(self, *args):
+    def toggle_tx_border(self, *args):
         if pm.polyOptions(q=True, displayMapBorder=True)[0]:
             pm.polyOptions(displayMapBorder=False)
         else:
             pm.polyOptions(displayMapBorder=True)
 
 
-class opts02UI(toolsUI):
+class Opts02UI(ToolsUI):
     def __init__(self, par, editor):
         self.editor = editor
-        toolsUI.__init__(self, par)
+        ToolsUI.__init__(self, par)
 
         with pm.gridLayout(p=par, nc=2, cwh=[26, 26]) as self.layout:
-            gridDisp = pm.iconTextCheckBox(image1='gridDisplay.png',
+            griddisp = pm.iconTextCheckBox(image1='gridDisplay.png',
                                            value=pm.textureWindow(self.editor, q=True, toggle=True),
                                            onc=lambda *args: pm.textureWindow(self.editor, e=True, toggle=True),
                                            ofc=lambda *args: pm.textureWindow(self.editor, e=True, toggle=False),
                                            ann=pm.mel.uiRes('m_textureWindowCreateToolBar.kViewGridAnnot'))
-            pm.popupMenu(button=3, p=gridDisp, pmc=lambda *args: pm.mel.performTextureViewGridOptions(1))
+            pm.popupMenu(button=3, p=griddisp, pmc=lambda *args: pm.mel.performTextureViewGridOptions(1))
 
-            pxSnap = pm.iconTextCheckBox(image1='pixelSnap.png',
+            pxsnap = pm.iconTextCheckBox(image1='pixelSnap.png',
                                          value=pm.snapMode(q=True, pixelSnap=True),
                                          onc=lambda *args: pm.snapMode(pixelSnap=True),
                                          ofc=lambda *args: pm.snapMode(pixelSnap=False),
                                          ann=pm.mel.uiRes('m_textureWindowCreateToolBar.kPixelSnapAnnot'))
-            pm.popupMenu(button=3, p=pxSnap, pmc=lambda *args: pm.mel.performPixelSnapOptions(1))
+            pm.popupMenu(button=3, p=pxsnap, pmc=lambda *args: pm.mel.performPixelSnapOptions(1))
 
             pm.iconTextButton(image1='textureEditorDisplayColor.png',
                               c=lambda *args: pm.textureWindow(self.editor, e=True, displayStyle='color'),
@@ -920,16 +929,16 @@ class opts02UI(toolsUI):
                               ann='m_textureWindowCreateToolBar.kDisplayAlphaChannelsAnnot')
 
 
-class opts03UI(toolsUI):
+class Opts03UI(ToolsUI):
     def __init__(self, par, editor):
-        toolsUI.__init__(self, par)
+        ToolsUI.__init__(self, par)
         self.editor = editor
         with pm.gridLayout(p=par, nc=2, cwh=[26, 26]) as self.layout:
-            swapBG = pm.iconTextCheckBox(image1='swapBG.png',
+            swapbg = pm.iconTextCheckBox(image1='swapBG.png',
                                          value=pm.optionVar['displayEditorImage'],
                                          ann=pm.mel.uiRes('m_textureWindowCreateToolBar.kUVTextureEditorBakingAnnot'),
                                          cc=lambda *args: pm.mel.textureWindowToggleEditorImage(self.editor))
-            pm.popupMenu(button=3, p=swapBG, pmc=lambda *arg: pm.mel.performTextureViewBakeTextureOptions(1))
+            pm.popupMenu(button=3, p=swapbg, pmc=lambda *arg: pm.mel.performTextureViewBakeTextureOptions(1))
 
             pm.iconTextButton(image1='updatePsdTextureEditor.png',
                               ann=pm.mel.uiRes('m_textureWindowCreateToolBar.kUpdatePSDNetworksAnnot'),
@@ -962,7 +971,7 @@ class UV(object):
     def __repr__(self):
         return repr(self.uvs)
 
-    def getBounds(self):
+    def get_bounds(self):
         self.bounds = pm.polyEvaluate(self.uvs, bc2=True)
         self.xMin = self.bounds[0][0]
         self.xMax = self.bounds[0][1]
@@ -970,18 +979,18 @@ class UV(object):
         self.yMax = self.bounds[1][1]
         return self.bounds
 
-    def getPivot(self):
+    def get_pivot(self):
         piv = pm.polyEvaluate(self.uvs, bc2=True)
-        pivU = ((piv[0][0] + piv[0][1]) * 0.5)
-        pivV = ((piv[1][0] + piv[1][1]) * 0.5)
-        return pivU, pivV
+        pivu = ((piv[0][0] + piv[0][1]) * 0.5)
+        pivv = ((piv[1][0] + piv[1][1]) * 0.5)
+        return pivu, pivv
 
-    def getShells(self):
+    def get_shells(self):
         if len(self.shells):
             pm.warning('Class is already a shell')
             return
 
-        curSel = pm.selected()
+        cursel = pm.selected()
         self.shells = []
         for uv in self.uvs:
             found = False
@@ -993,9 +1002,9 @@ class UV(object):
                 pm.mel.polySelectBorderShell(0)
                 sel = pm.ls(pm.polyListComponentConversion(tuv=True), fl=True)
                 thisShell = UV(sel)
-                thisShell.getBounds()
+                thisShell.get_bounds()
 
                 self.shells.append(thisShell)
 
-        pm.select(curSel)
+        pm.select(cursel)
         return self.shells
